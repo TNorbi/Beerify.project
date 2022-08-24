@@ -1,0 +1,23 @@
+Widget build(BuildContext context) {
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<ChallengeProvider>(
+            create: (context) => ChallengeProvider(api: Api())),
+        ChangeNotifierProvider<UserProvider>(
+            create: (context) => UserProvider(api: Api())),
+      ],
+      child: MaterialApp(
+        title: "Challenge app",
+        theme: buildLightTheme(),
+        onGenerateRoute: AppRouter.generateRoute,
+        initialRoute: RoutePaths.loginRoute,
+        localizationsDelegates: const [
+          S.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: S.delegate.supportedLocales,
+      ),
+    );
+  }

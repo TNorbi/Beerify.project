@@ -1,1 +1,2 @@
-# Beerify.project
+# Beerify
+Software-development project

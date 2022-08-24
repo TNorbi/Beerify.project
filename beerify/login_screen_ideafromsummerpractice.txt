@@ -1,0 +1,168 @@
+import 'package:challenge_app/providers/user_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:challenge_app/generated/l10n.dart';
+import 'package:challenge_app/core/route_constants.dart';
+import 'package:challenge_app/theme_data.dart';
+import 'package:provider/provider.dart';
+
+class LoginScreen extends StatefulWidget {
+  LoginScreen({Key? key}) : super(key: key);
+
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  bool _isHiddenPassword = true;
+  String email = '';
+  String password = '';
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: Text(S.of(context).loginScreenTitle,
+              style: TextStyle(color: lightColorScheme.background)),
+          textTheme: lightTextTheme),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        padding: EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            //Sign In Text
+            Text(S.of(context).loginScreenSignInText,
+                style: Theme.of(context).textTheme.headline1),
+            SizedBox(height: 16),
+            //Container, in which I write Username above Username TextFormField
+            Container(
+              child: Text(S.of(context).usernameTextField,
+                  style: Theme.of(context).textTheme.subtitle1),
+            ),
+            SizedBox(height: 8),
+            //Form, which contains Username, and Password TextFormFields,
+            //On every character press, it calls both TextFormFields validator through his onChanged method
+            Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextFormField(
+                    style: Theme.of(context).textTheme.bodyText1,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.account_circle_rounded),
+                      hintText: S.of(context).usernameHintText,
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            width: 1,
+                            color: Theme.of(context).colorScheme.onSurface),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            width: 1, color: lightColorScheme.primary),
+                      ),
+                    ),
+                    //the validator not allows empty username fields
+                    validator: (String? value) {
+                      if (value == '') {
+                        //If we forgot to write anything in the username fields, the app warns us.
+                        return S.of(context).emptyField;
+                      }
+                      return null;
+                    },
+                    onChanged: (value) {
+                      email = value;
+                    },
+                  ),
+                  SizedBox(height: 8),
+                  //Password text above Password TextFormField
+                  Text(S.of(context).loginScreenPassword,
+                      style: Theme.of(context).textTheme.subtitle1),
+                  SizedBox(height: 8),
+                  TextFormField(
+                    obscureText: _isHiddenPassword,
+                    style: Theme.of(context).textTheme.bodyText1,
+                    decoration: InputDecoration(
+                      hintText: S.of(context).passwordInputTextField,
+                      prefixIcon: Icon(Icons.lock),
+                      suffixIcon: InkWell(
+                        onTap: _togglePasswordView,
+                        child: _isHiddenPassword
+                            ? Icon(Icons.visibility)
+                            : Icon(Icons.visibility_off),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            width: 1,
+                            color: Theme.of(context).colorScheme.onSurface),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            width: 1, color: lightColorScheme.primary),
+                      ),
+                      //Hides the text in the Form
+                    ),
+                    //the validator not allows empty username fields
+                    validator: (String? value) {
+                      if (value == '') {
+                        //If we forgot to write anything in password fields, the app warns us.
+                        return S
+                            .of(context)
+                            .loginScreenEmptyPasswordFieldErrorText;
+                      }
+                      return null;
+                    },
+                    onChanged: (value) {
+                      password = value;
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  //The button which allows to sign in your app.
+                  //It is only visible, when both Username, and Password fields are not empty
+                  Container(
+                      width: 400,
+                      height: 60,
+                      child: ElevatedButton(
+                        child: Text(
+                          S.of(context).loginScreenEntryButtonText,
+                          style: Theme.of(context).textTheme.bodyText1,
+                        ),
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            Provider.of<UserProvider>(context, listen: false)
+                                .loginUser(email: email, password: password)
+                                .then((value) => Navigator.pushNamed(
+                                    context, RoutePaths.homeRoute));
+                          }
+                        },
+                      )),
+                  SizedBox(height: 8),
+                  //Button, which navigates to ForgotPassword Screen, if the user
+                  //wants to change his password
+                  TextButton(
+                      child: Text(
+                        S.of(context).loginScreenForgotPasswordButtonText,
+                      ),
+                      onPressed: () {
+                        Navigator.pushNamed(
+                            context, RoutePaths.forgotPasswordRoute);
+                      }),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _togglePasswordView() {
+    setState(() {
+      _isHiddenPassword = !_isHiddenPassword;
+    });
+  }
+}
