@@ -1,2 +1,3 @@
 # Beerify
-Software-development project
+
+# DISCLAIMER
